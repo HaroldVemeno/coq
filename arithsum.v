@@ -1,6 +1,7 @@
 From Coq Require Import Arith.
-
 Require Import Arith.
+
+Require Import Psatz.
 
 Fixpoint div2 (n : nat) : nat :=
   match n with
@@ -14,6 +15,9 @@ Fixpoint arith_sum (n : nat) : nat :=
   | 0 => 0
   | S m => n + arith_sum m
   end.
+
+Definition arith_formula2 (n : nat) : nat := div2 (n * (n + 1)).
+
 
 Definition arith_formula (n : nat) : nat := div2 (n * (n + 1)).
 
@@ -132,6 +136,7 @@ Proof.
     repeat rewrite Nat.add_assoc.
 *)
 
+
 Theorem div2_formula : forall (x : nat), exists (y : nat), 2 * y = x * (x + 1).
 Proof.
   intros.
@@ -169,4 +174,46 @@ Proof.
     rewrite Nat.mul_assoc.
     reflexivity.
   Show Proof.
+Qed.
+
+Theorem inducted_div2 (x y : nat) : div2 (2 * x + y) = x + div2 (y).
+Proof.
+  induction x.
+    simpl.
+    reflexivity.
+    simpl Nat.add.
+    rewrite (Nat.add_comm x 0).
+    simpl Nat.add.
+    rewrite (Nat.add_comm x (S x)).
+    simpl Nat.add.
+    simpl div2.
+    f_equal.
+    assert (x + x = 2 * x).
+    simpl.
+    rewrite (Nat.add_comm x 0).
+    simpl.
+    reflexivity.
+    rewrite H.
+    assumption.
+Qed.
+
+Definition even n := exists y,     2 * y = n.
+Definition odd  n := exists y, 1 + 2 * y = n.
+
+Theorem even_div2 (n : nat) : even n -> 2 * div2 n = n.
+Proof.
+  intros.
+  unfold even in H.
+  destruct H.
+  rewrite <- H.
+  assert (2 * x = 2 * x + 0); auto.
+  rewrite H0 at 1.
+  rewrite (inducted_div2 x).
+  simpl div2.
+  simpl.
+  rewrite (Nat.add_comm x 0).
+  simpl.
+  rewrite (Nat.add_comm x 0).
+  simpl.
+  reflexivity.
 Qed.
