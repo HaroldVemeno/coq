@@ -1,5 +1,4 @@
 Require Import Setoid.
-Require Import Classical.
 
 Theorem not_not_not : forall P, ~~~P <-> ~P.
 Proof.
@@ -69,11 +68,11 @@ Proof.
   apply (H H0 H0).
 Qed.
 
-Theorem PPP : forall P, ((~P)->P)->P.
+Theorem PPP : forall P, (P \/ ~P) -> ((~P)->P)->P.
 Proof.
   intros.
-  elim (classic P).
-  intros.
-  apply H0.
-  apply H.
+  case H.
+  intro.
+  apply H1.
+  exact H0.
 Qed.
