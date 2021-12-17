@@ -59,5 +59,26 @@ Proof.
   intros.
   split.
   intros.
-  case H.
+  induction H.
   apply zero'.
+  apply (sum_multiple _ _ three' IHmultiple_of_3).
+  intros.
+  induction H.
+  repeat constructor.
+  repeat constructor.
+  induction IHmultiple_of_3'1.
+  simpl.
+  exact IHmultiple_of_3'2.
+  simpl.
+  constructor.
+  apply IHIHmultiple_of_3'1.
+  refine (difference_multiple n 3 (S (S (S n))) three' H _).
+  rewrite Nat.add_comm.
+  simpl.
+  reflexivity.
+  generalize dependent m.
+  generalize dependent l.
+  intros.
+
+
+Qed.

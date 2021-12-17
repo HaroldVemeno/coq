@@ -13,3 +13,6 @@ Proof.
   exists x.
   intro.
   contradiction.
+  Show Proof.
+Qed.
+

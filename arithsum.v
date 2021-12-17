@@ -10,6 +10,19 @@ Fixpoint div2 (n : nat) : nat :=
     | S (S m) => S (div2 m)
   end.
 
+Theorem div2_n: forall n k, div2 (2 * n + k) = n + div2 (k).
+Proof.
+  intros.
+  induction n.
+  - reflexivity.
+  - rewrite Nat.mul_comm.
+    simpl.
+    rewrite Nat.mul_comm.
+    rewrite IHn.
+    reflexivity.
+Qed.
+
+
 Fixpoint arith_sum (n : nat) : nat :=
   match n with
   | 0 => 0
@@ -95,6 +108,34 @@ Proof.
     simpl Nat.mul.
     reflexivity.
     Show Proof.
+Qed.
+
+Theorem arith_eq3 : forall (n : nat), arith_formula n = arith_sum n.
+Proof.
+  intros n.
+  induction n.
+  - compute.
+    reflexivity.
+  - simpl.
+    rewrite <- IHn.
+    unfold arith_formula.
+    rewrite Nat.add_comm.
+    simpl.
+    rewrite Nat.mul_comm.
+    simpl.
+    pose proof div2_n n.
+    simpl "*" in H.
+    rewrite Nat.add_0_r in H.
+    rewrite Nat.add_assoc.
+    rewrite (H (n + n * n)).
+    f_equal.
+    f_equal.
+    f_equal.
+    symmetry.
+    rewrite Nat.mul_comm.
+    rewrite Nat.add_comm.
+    simpl.
+    reflexivity.
 Qed.
 (*
 Theorem div2_formula : forall (x : nat), exists (y : nat), 2 * y = x * (x + 1).

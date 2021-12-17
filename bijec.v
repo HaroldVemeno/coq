@@ -1,5 +1,5 @@
 
-Require Import Arith.
+Require Import Arith Lia.
 
 Record iso (A B : Set) : Set :=
   bijection {
@@ -55,8 +55,7 @@ Proof.
   intros.
   elim H.
   intros.
-  apply (bijection B A B_to_A0 A_to_B0);
-  assumption.
+  exact (bijection B A B_to_A0 A_to_B0 B_A_B0 A_B_A0).
 Qed.
 
 
@@ -141,34 +140,85 @@ Fixpoint nat_to_nn (n : nat) : nat_plus_nat
 Definition nn_to_nat (n : nat_plus_nat) : nat
   := match n with
        | left l => l + l
-       | right r => r + r + 1
+       | right r => S (r + r)
      end.
+
+Definition nat_ind_two : forall P, 
+  P 0 -> P 1 -> (forall n, P n -> P (S (S n))) -> (forall n, P n).
+Proof.
+  intros P P0 P1 PSS.
+  exact (fix go (n:nat): P n := match n with
+    | 0 => P0
+    | 1 => P1
+    | S (S n_bez_dvou) => PSS n_bez_dvou (go n_bez_dvou)
+  end
+  ).
+Qed.
+
+Definition nat_ind_two2 : forall P, 
+  P 0 -> P 1 -> (forall n, P n -> P (S (S n))) -> (forall n, P n).
+Proof.
+  intros P P0 P1 PSS.
+  fix IPn 1.
+  intro m.
+  destruct m.
+  exact P0.
+  destruct m.
+  exact P1.
+  apply PSS.
+  exact (IPn m).
+Qed.
+
 
 (* Task 2-2. Prove that nat has the same cardinality as nat_plus_nat. *)
 Theorem nat_iso_natpnat : iso nat nat_plus_nat.
 Proof.
   apply (bijection _ _ nat_to_nn nn_to_nat).
-  intros.
-  assert (forall n : nat, n = 0 \/ n = 1 \/ exists m : nat, n = S (S m)).
-    intros.
+  - intros.
+    induction a using nat_ind_two.
+    compute. easy.
+    compute. easy.
+    simpl.
+    destruct (nat_to_nn a).
+    simpl in IHa.
+    simpl.
+    lia.
+    simpl in IHa.
+    simpl.
+    lia.
+  - intros.
+    destruct b. 
+    simpl.
     induction n.
-    left.
+    compute.
     reflexivity.
+    assert (S n + S n = S (S (n + n))) by lia.
+    rewrite -> H.
+    simpl.
+    rewrite -> IHn.
+    reflexivity.
+    simpl nn_to_nat.
     induction n.
-    right. left.
+    compute.
     reflexivity.
-    right. right.
-    exists n.
+    simpl.
+    assert (n + S n = S (n + n)) by lia.
+    rewrite -> H.
+    rewrite -> IHn.
     reflexivity.
-  pose proof H a.
-  destruct H0.
-  rewrite H0.
-  simpl.
-  reflexivity.
-  destruct H0.
-  rewrite H0.
-  simpl.
-  reflexivity.
-  destruct H0.
-  rewrite H0.
-  simpl.
+Qed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
