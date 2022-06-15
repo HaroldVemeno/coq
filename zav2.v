@@ -144,4 +144,4 @@ Definition testvec := cons 5 (cons 1 (cons 9 (cons 4 (nil)))).
 Definition flip {A B C} (f: A -> B -> C) (b : B) (a : A) : C := f a b.
 
 Eval cbn in foldl1 (fun a b => a + b) testvec.
-Eval cbn in foldr1 (fun a b => a + b) testvec.
+Eval cbn in foldr1 (fun a b => a * b) testvec.

@@ -417,27 +417,34 @@ Theorem insert_sorted n l: Sorted l -> Sorted (insert n l).
 Proof.
   intros.
   induction l.
-  simpl. constructor.
+  1: simpl. constructor.
   simpl.
   destruct (Nat.ltb_spec n n0).
-  constructor.
-  lia.
-  exact H.
-  destruct l.
-  simpl. constructor. lia. constructor.
-  inversion H; subst.
-  specialize (IHl rest_sorted).
-  simpl in *.
-  destruct (Nat.ltb_spec n n1).
-  repeat constructor; try lia. easy.
-  constructor.
-  lia.
-  exact IHl.
+  - constructor.
+    apply Nat.lt_le_incl.
+    easy.
+    exact H.
+  - inversion H; subst.
+    + simpl.
+      constructor.
+      exact H0.
+      constructor.
+    + specialize (IHl rest_sorted).
+      simpl in *.
+      destruct (Nat.ltb_spec n m).
+      constructor.
+      exact H0.
+      constructor.
+      apply Nat.lt_le_incl.
+      exact H1.
+      exact rest_sorted.
+      constructor.
+      exact first_pair_sorted.
+      exact IHl.
 Defined.
 
 Theorem insert_list_sorted i o: Sorted o -> Sorted (insert_list i o).
 Proof.
-  intros.
   generalize dependent o.
   induction i; intros.
   simpl.
@@ -488,7 +495,12 @@ Proof.
   rewrite <- IHi.
   rewrite <- insert_permutation.
   simpl.
-  lia.
+  rewrite <- Nat.add_assoc.
+  rewrite Nat.add_comm.
+  rewrite <- Nat.add_assoc.
+  f_equal.
+  rewrite Nat.add_comm.
+  f_equal.
 Defined.
 
 Theorem insertsort_permutation l: Permutation l (insertsort l).
@@ -498,13 +510,15 @@ Proof.
   rewrite <- insert_list_permutation.
   rewrite count_append.
   simpl.
-  lia.
+  rewrite Nat.add_0_r.
+  easy.
 Defined.
 
 Definition insertsort_spec l: Sorted (insertsort l) /\ Permutation l (insertsort l)
     := conj (insertsort_sorted l) (insertsort_permutation l).
 
-Compute (insertsort_spec []).
+Eval vm_compute in insertsort_spec [3; 6; 2].
+
 
 (* Require Import Extraction. *)
 
